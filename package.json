@@ -1,0 +1,11 @@
+{
+  "name": "apirestnode",
+  "version": "1.0.0",
+  "description": "API Rest con NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Roberto Vazquez (roberto.smusic.1@gmail.com)",
+  "license": "MIT"
+}
