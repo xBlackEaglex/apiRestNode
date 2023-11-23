@@ -19,26 +19,24 @@ app.use(cors());
 
 // convertir body a objeto js
 
-app.use(express.json());
+app.use(express.json());  // recibir datos con content-type app/json
+app.use(express.urlencoded({ extended: true})); // form-urlencoded app/json
 
-//crear rutas
+
+//Rutas
+
+const rutas_articulos = require("./rutas/articulos");
+
+
+// cargo las rutas
+
+app.use("/api", rutas_articulos);
+
+
+// Rutas prueba hardcodeadas 
 
 app.get("/", (req, res) => {
     return res.status(200).send("<h1>Empezando a crear una api rest con node</h1>")
-})
-
-app.get("/probando", (req, res) => {
-    console.log("se ha ejecutado el endpoint probando");
-    return res.status(200).send([{
-        curso: "master en react",
-        autor: "Victor Robles Web",
-        url: "victorroblesweb.es/master-react"
-    },
-    {
-        curso: "Api Rest",
-        autor: "Victor Robles Web",
-        url: "victorroblesweb.es/api-rest"
-    }])
 })
 
 //crear servidor y escuchar peticiones http
