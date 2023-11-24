@@ -1,12 +1,12 @@
-const { schema, model } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
-const ArticuloSchema = schema({
+const ArticuloSchema = Schema({
     titulo: {
-        type: string,
+        type: String,
         required : true
     },
     contenido: {
-        type: string,
+        type: String,
         required : true
     },
     fecha: {
@@ -14,7 +14,7 @@ const ArticuloSchema = schema({
         default: Date.now
     },
     imagen: {
-        type: string,
+        type: String,
         default: "default.png"
     },
 });

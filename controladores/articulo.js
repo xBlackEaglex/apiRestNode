@@ -1,8 +1,9 @@
 const validator = require("validator");
+const Articulo = require("../modelos/Articulo");
 
 const prueba = (req, res) => {
     return res.status(200).json({
-        mesaje: "Soy una acicion de prueba de mi contolador de articulos"
+        mesaje: "Soy una acicion de prueba de mi controlador de articulos"
     });
 };
 
@@ -20,7 +21,7 @@ const curso = (req, res) => {
     }])
 };
 
-const crear = (req, res) => {
+const crear = async (req, res) => {
 
     // Recoger parámetros por post a guardar 
 
@@ -46,16 +47,54 @@ const crear = (req, res) => {
 
     // crear el objeto a guardar 
 
+    const articulo = new Articulo(parametros); // esta linea tambien guarda de manera automatica y no es necesario hacerlo manual como en la linea siguiente 
+    
     //asignar valores a objeto en el modelo (manual o automático)
+
+        // manera manual    articulo.titulo = parametros.titulo;
 
     // Guardar el articulo en la base de datos
 
-    // devolver resultado 
+    // articulo.save((error, articuloGuardado) => {
+    //     if (error || !articuloGuardado) {
+    //         return res.status(400).json({
+    //             status: "error",
+    //             mensaje: "no se a guardado el articulo"
+    //         });
+    //     }
 
-    return res.status(200).json({
-        mensaje: "accion de guardar",
-        parametros
-    })
+    // // devolver resultado 
+    //     return res.status(200).json({
+    //         status: "success",
+    //         articulo: articuloGuardado,
+    //         mensaje: "Articulo creado con exito !!"
+    //     })
+
+    // });
+
+    // // lo anterior se usaba con anterior version de mongoose
+
+    // manera actualiza
+
+    try {
+        // Guardar el articulo en la base de datos usando async/await
+        const articuloGuardado = await articulo.save();
+        
+        // devolver resultado 
+        return res.status(200).json({
+            status: "success",
+            articulo: articuloGuardado,
+            mensaje: "Articulo creado con éxito !!"
+        });
+
+    } catch (error) {
+        // Manejar errores durante el guardado
+        return res.status(400).json({
+            status: "error",
+            mensaje: "No se ha guardado el artículo"
+        });
+    }
+
 };
 
 module.exports = {
