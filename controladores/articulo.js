@@ -97,8 +97,33 @@ const crear = async (req, res) => {
 
 };
 
+const listar = async (req, res) => {
+    try {
+        const articulos = await Articulo.find({}).exec();
+
+        if (!articulos || articulos.length === 0) {
+            return res.status(404).json({
+                status: "error",
+                mensaje: "No se encontraron artículos"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            articulos
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            mensaje: "Error en la consulta",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     prueba,
     curso,
-    crear
+    crear,
+    listar
 }
