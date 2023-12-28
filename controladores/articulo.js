@@ -99,7 +99,14 @@ const crear = async (req, res) => {
 
 const listar = async (req, res) => {
     try {
-        const articulos = await Articulo.find({}).exec();
+        let query = Articulo.find({})
+                            .sort({fecha: -1});
+    
+        if (req.params.ultimos ){
+            query.limit(req.params.ultimos)
+        };
+
+        const articulos = await query;
 
         if (!articulos || articulos.length === 0) {
             return res.status(404).json({
@@ -110,6 +117,7 @@ const listar = async (req, res) => {
 
         return res.status(200).json({
             status: "success",
+            contador: articulos.length,
             articulos
         });
     } catch (error) {
@@ -121,9 +129,58 @@ const listar = async (req, res) => {
     }
 };
 
+const uno =  async (req, res) => {
+    // Recoger un id por la URL
+    let id  = req.params.id;
+
+    try {
+        // Buscar el artículo
+        const articulo = await Articulo.findById(id);
+
+        // Devolver el resultado
+
+        return res.status(200).json({
+            status: "success",
+            articulo
+        });
+
+    } catch (error) {
+        // Si no se encuentra el artículo
+
+        return res.status(404).json({
+            status: "error",
+            mensaje: "No se ha encontrado el artículo"
+        });
+    
+    }
+};
+
+const borrar = async (req, res) => {
+    let id = req.params.id;
+
+    try {
+        const articuloBorrado = await Articulo.findOneAndDelete({_id: id});
+
+        return res.status(200).json({
+            status: "success",
+            articulo: articuloBorrado,
+            mensaje: "Articulo borrado con éxito"
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            mensaje: "No se ha podido borrar el artículo"
+        })
+    }
+
+}
+
 module.exports = {
     prueba,
     curso,
     crear,
-    listar
+    listar,
+    uno,
+    borrar
 }
