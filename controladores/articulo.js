@@ -1,5 +1,5 @@
-const validator = require("validator");
 const Articulo = require("../modelos/Articulo");
+const {validarArticulo} = require("../helpers/validar");
 
 const prueba = (req, res) => {
     return res.status(200).json({
@@ -29,20 +29,8 @@ const crear = async (req, res) => {
 
     // validar datos
 
-    try {
-
-        let validar_titulo = !validator.isEmpty(parametros.titulo) && validator.isLength(parametros.titulo, {min: 5, max: undefined});
-        let validar_contenido = !validator.isEmpty(parametros.contenido);
-
-        if (!validar_contenido || !validar_titulo) {
-            throw new Error("No se ha validado la informacion !!");
-        }
-
-    }catch(error) {
-        return res.status(400).json({
-            status: "error",
-            mensaje: "Faltan datos por enviar"
-        });
+    if (validarArticulo(res, parametros) != true) {
+        return;
     }
 
     // crear el objeto a guardar 
@@ -54,27 +42,6 @@ const crear = async (req, res) => {
         // manera manual    articulo.titulo = parametros.titulo;
 
     // Guardar el articulo en la base de datos
-
-    // articulo.save((error, articuloGuardado) => {
-    //     if (error || !articuloGuardado) {
-    //         return res.status(400).json({
-    //             status: "error",
-    //             mensaje: "no se a guardado el articulo"
-    //         });
-    //     }
-
-    // // devolver resultado 
-    //     return res.status(200).json({
-    //         status: "success",
-    //         articulo: articuloGuardado,
-    //         mensaje: "Articulo creado con exito !!"
-    //     })
-
-    // });
-
-    // // lo anterior se usaba con anterior version de mongoose
-
-    // manera actualiza
 
     try {
         // Guardar el articulo en la base de datos usando async/await
@@ -176,11 +143,45 @@ const borrar = async (req, res) => {
 
 }
 
+const editar = async (req, res) => {
+    // recoger id
+    let articuloId = req.params.id;
+
+    // recoger datos del body
+    let parametros = req.body;
+
+    //validar datos
+    if (validarArticulo(res, parametros) != true) {
+        return;
+    }
+    
+    // buscar y actualizar
+    try {
+        const articuloActualizado = await Articulo.findOneAndUpdate({_id: articuloId}, parametros, {new: true});
+
+        // devolver respuesta 
+
+        return res.status(200).json({
+            status: "success",
+            articulo: articuloActualizado,
+            mensaje: "Articulo actualizado con éxito" 
+        });
+        
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            mensaje: "No se ha podido actualizar el artículo" 
+        });
+    }
+
+}
+
 module.exports = {
     prueba,
     curso,
     crear,
     listar,
     uno,
-    borrar
+    borrar,
+    editar
 }

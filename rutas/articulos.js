@@ -19,4 +19,6 @@ router.get("/articulo/:id", ArticuloControlador.uno);
 
 router.delete("/articulo/:id", ArticuloControlador.borrar);
 
+router.put("/articulo/:id", ArticuloControlador.editar);
+
 module.exports = router;
