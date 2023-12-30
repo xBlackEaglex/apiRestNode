@@ -1,5 +1,7 @@
 const Articulo = require("../modelos/Articulo");
 const {validarArticulo} = require("../helpers/validar");
+const fs = require("fs"); 
+const path = require("path");
 
 const prueba = (req, res) => {
     return res.status(200).json({
@@ -176,6 +178,80 @@ const editar = async (req, res) => {
 
 }
 
+const subir = async (req, res) => {
+
+    // configurar multer, se hace en las rutas
+
+    // recoger el fichero de la imagen
+    if (!req.file && !req.files) {
+        return res.status(404).json({
+            status: "error",
+            mensaje: "petición invalida" 
+        })
+    }
+
+    // nombre del archivo
+    let archivo = req.file.originalname;
+
+    // extension del archivo 
+    let archivoSplit = archivo.split("\.");
+    let extension = archivoSplit[1];
+
+    //comprobar extension correcta 
+    if (extension != "png" && extension != "jpg" && extension != "jpeg" && extension != "gif") {
+        
+        // borrar archivo y dar respuesta
+        fs.unlink(req.file.path, () => {
+            return res.status(400).json({
+                status: "error",
+                mensaje: "Imagen invalida"
+            }) 
+        })
+    }else{
+
+        // recoger id
+        let articuloId = req.params.id;
+
+        // buscar y actualizar
+        try {
+            const articuloActualizado = await Articulo.findOneAndUpdate({_id: articuloId}, {imagen: req.file.filename}, {new: true});
+
+            // devolver respuesta 
+
+            return res.status(200).json({
+                status: "success",
+                articulo: articuloActualizado,
+                mensaje: "Articulo actualizado con éxito",
+                fichero: req.file
+            });
+            
+        } catch (error) {
+            fs.unlink(req.file.path, () => {
+                return res.status(500).json({
+                    status: "error",
+                    mensaje: "No se a podido actualizar el articulo"
+                }) 
+            })
+        }
+    }
+}
+
+const imagen = (req, res) => {
+    let fichero = req.params.fichero;
+    let rutaFisica = "./imagenes/articulos/" + fichero;
+
+    fs.stat(rutaFisica, (error, existe) => {
+        if (existe) {
+            return res.sendFile(path.resolve(rutaFisica));
+        }else {
+            return res.status(404).json({
+                status: "error",
+                mensaje: "La imagen no existe"
+            }) 
+        }
+    })
+}
+
 module.exports = {
     prueba,
     curso,
@@ -183,5 +259,7 @@ module.exports = {
     listar,
     uno,
     borrar,
-    editar
+    editar,
+    subir,
+    imagen
 }
