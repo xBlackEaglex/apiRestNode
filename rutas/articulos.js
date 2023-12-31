@@ -38,4 +38,6 @@ router.post("/subir-imagen/:id", [subidas.single("file0")], ArticuloControlador.
 
 router.get("/imagen/:fichero", ArticuloControlador.imagen);
 
+router.get("/buscar/:busqueda", ArticuloControlador.buscador);
+
 module.exports = router;
